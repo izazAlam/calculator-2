@@ -1,3 +1,42 @@
+const buttons = [
+  { key: "clear", label: "AC", type: "action" },
+  { key: "brackets", label: "( )", type: "action" },
+  { key: "%", label: "%", type: "action" },
+  { key: "/", label: "÷", type: "operator" },
+  { key: "7", label: "7", type: "" },
+  { key: "8", label: "8", type: "" },
+  { key: "9", label: "9", type: "" },
+  { key: "*", label: "X", type: "operator" },
+  { key: "4", label: "4", type: "" },
+  { key: "5", label: "5", type: "" },
+  { key: "6", label: "6", type: "" },
+  { key: "-", label: "-", type: "operator" },
+  { key: "1", label: "1", type: "" },
+  { key: "2", label: "2", type: "" },
+  { key: "3", label: "3", type: "" },
+  { key: "+", label: "+", type: "operator" },
+  { key: "backspace", label: "<", type: "action" },
+  { key: "0", label: "0", type: "" },
+  { key: ".", label: ".", type: "" },
+  { key: "=", label: "=", type: "operator" },
+];
+
+const keysContainer = document.querySelector("#keys-container");
+
+function renderButtons() {
+  keysContainer.innerHTML = buttons
+    .map(
+      (btn) => `
+    <div data-key="${btn.key}" class="key ${btn.type}">
+      <span>${btn.label}</span>
+    </div>
+    `,
+    )
+    .join("");
+}
+
+renderButtons();
+
 const keys = document.querySelectorAll(".key");
 const display_input = document.querySelector(".display .input");
 const display_output = document.querySelector(".display .output");
@@ -60,46 +99,29 @@ for (let key of keys) {
     }
   });
 }
-function cleanInput(input) {
-  let input_array = input.split("");
-  let input_array_length = input_array.length;
 
-  for (let i = 0; i < input_array_length; i++) {
-    if (input_array[i] == "*") {
-      input_array[i] = ` <span class="operator">x</span> `;
-    } else if (input_array[i] == "/") {
-      input_array[i] = ` <span class="operator">÷</span> `;
-    } else if (input_array[i] == "+") {
-      input_array[i] = ` <span class="operator">+</span> `;
-    } else if (input_array[i] == "-") {
-      input_array[i] = ` <span class="operator">-</span> `;
-    } else if (input_array[i] == ")") {
-      input_array[i] = `<span class="brackets">)</span>`;
-    } else if (input_array[i] == "(") {
-      input_array[i] = `<span class="brackets">(</span>`;
-    } else if (input_array[i] == "%") {
-      input_array[i] = `<span class="percent">%</span>`;
-    }
-  }
-  return input_array.join("");
+function cleanInput(input) {
+  const operators = {
+    "*": ' <span class="operator">x</span> ',
+    "/": ' <span class="operator">÷</span> ',
+    "+": ' <span class="operator">+</span> ',
+    "-": ' <span class="operator">-</span> ',
+    ")": '<span class="brackets">)</span>',
+    "(": '<span class="brackets">(</span>',
+    "%": '<span class="percent">%</span>',
+  };
+
+  return input
+    .split("")
+    .map((char) => operators[char] || char)
+    .join("");
 }
 function cleanOutput(output) {
-  let output_string = output.toString();
-  let decimal = output_string.split(".")[1];
-  output_string = output_string.split(".")[0];
+  let [integer, decimal] = output.toString().split(".");
 
-  let output_array = output_string.split("");
+  integer = Number(integer).toLocaleString("en-US");
 
-  if (output_array.length > 3) {
-    for (let i = output_array.length - 3; i > 0; i -= 3) {
-      output_array.splice(i, 0, ",");
-    }
-  }
-  if (decimal) {
-    output_array.push(".");
-    output_array.push(decimal);
-  }
-  return output_array.join("");
+  return decimal ? `${integer}.${decimal}` : integer;
 }
 
 function validateInput(value) {
